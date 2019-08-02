@@ -36,3 +36,30 @@ rustup component add rustfmt
 rustup component add clippy
 ```
 
+## Hello World
+```bash
+cargo new hello-rust
+```
+
+```bash
+cargo run
+```
+
+## Dependencies
+- Managed via Cargo.toml
+- Libraries found on [crates.io](https://crates.io/), the pakcage registry for Rust.
+- Packages refered to as "crates."
+
+Add `ferris-says`
+```toml
+[dependencies]
+ferris-says = "0.1"
+```
+
+Add this dependency to main.rs
+```rs
+use ferris_says::say;
+```
+We can now use the `say` function that `ferris-says` crate exports.
+
+
