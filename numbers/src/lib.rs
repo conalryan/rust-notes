@@ -130,10 +130,10 @@ pub fn print() {
     // Therefore, you can have a slice which references an array or a vector and treat them the same.
     // This is a very common abstraction tool used in Rust.
     let vector_numbers = vec![1, 2, 3, 4, 5];
-    output_sequence_vec(vector_numbers);
-    // or comment line above and uncomment line below.
+    // output_sequence_vec(vector_numbers);
+    // or uncomment line above and comment line below.
     // Cannot have both: Error move occurs because `vector_numbers` has type `std::vec::Vec<u8>`, which does not implement the `Copy` trait
-    // output_sequence_ref(&vector_numbers);
+    output_sequence_ref(&vector_numbers);
     let array_numbers = [1, 2, 3, 4, 5];
     output_sequence_ref(&array_numbers);
 }
@@ -161,6 +161,16 @@ fn output_sequence_vec(numbers: Vec<u8>) {
     }
 }
 
+/**
+ * [u8] slice of u8 values. 
+ * Unknown size at compile time. 
+ * Functions cannot take arguments of an unknown size. 
+ * 
+ * Indirection
+ * Allows access to slice of unknown size by passing a reference to the slice.
+ * &[u8] reference to a slice of u8 values which has a known size at compile time.
+ *
+ */
 fn output_sequence_ref(numbers: &[u8]) {
     println!("output_sequence_ref");
     for n in numbers {
