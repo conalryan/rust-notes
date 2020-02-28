@@ -258,3 +258,12 @@ fn generate_sequence_collect(limit: u8) -> Vec<u8> {
     // collect::<SomeType>()
     (1..=limit).collect()
 }
+
+// Test
+// Test is just a normal function with a special attribute, #[test], before it.
+// They come in two forms #[...] and #![...] which annotate the item they precede.
+#[test]
+fn generate_sequence_should_work() {
+    let result = generate_sequence(3);
+    assert_eq!(result, &[1, 2, 3]);
+}
