@@ -224,3 +224,28 @@ However, most difficulties of working with manual memory management are taken ca
 Therefore, you will often hear “zero cost” being used to describe certain features or abstractions in the language and standard library.
 This is meant to imply that neither performance nor reliability has to suffer to achieve a particular goal.
 You write high level code and the compiler turns it into the same thing as the “best” low level implementation.
+
+
+Making A Web App With Actix
+--------------------------------------------------------------------------------
+
+### Web Ecosystem
+One area where Rust stands out is in the building of web servers.
+Rust has its origins at Mozilla primarily as a tool for building a new browser engine.
+
+There are a few different layers to the web programming stack. Primarily we are concerned here with the application layer which is comparable to where Django, Rails, and Express live in Python, Ruby, and NodeJS, respectively.
+
+### Libraries that make up the web landscape
+
+### Hyper
+Hyper is a low level HTTP library built on even lower level libraries for building network services.
+Currently most web frameworks use Hyper internally for handling the actual HTTP requests.
+
+
+It can be used to build both HTTP clients and servers. However, there is a bit more boilerplate than you might want to write yourself when you want to focus on building an application. Therefore, we will use a library at a higher level of abstraction which still allows us to take advantage of what Hyper offers.
+
+### Actix
+The Actix project is actually a group of projects which define an actor system as well as a framework for building web applications. The web framework is aptly named actix-web. It has been built on top of futures and async primitives from the beginning. It also runs on the stable version of the compiler.
+
+It recently hit the 1.0 milestone which should bring some much needed stability to the ecosystem. Additionally, it has been at the top of the Tech Empower web framework benchmarks30. Even if those are artificial benchmarks, it still points to the performance potential possible.
+
