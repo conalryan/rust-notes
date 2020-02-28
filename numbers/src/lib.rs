@@ -12,7 +12,7 @@ pub fn say_hello() {
     println!("Hello, world!");
 }
 
-pub fn print() {
+pub fn print(limit: u8) {
     //  Variables
     //  Immutable by default.
     //  Type is infered based on the value used to initialize the variable.
@@ -102,12 +102,15 @@ pub fn print() {
     // Length - vectors have a length which says how many elements are in the container.
     // Capacity - vectors have a capacity which could be larger than the length.
     // Changing the capacity can involve quite a bit of work to allocate a new region of memory and move all of the data into that region.
-    
+    // 
     // Mulitplication factor:
     // As you add elements to a vector, capacity grows by a multiplicative factor
     // Done to reduce frequency. 
     // Biggest advantage: Sive of the vector is expandable; the length is not part of the type.
     //
+    // Copy Trait
+    // While arrays implement the Copy trait if their elements do, Vec does not.
+    // 
     // Note also that we are no longer explicitly calling iter on the numbers variable in our for loop preamble.
     // Implements a trait that tells the compiler how to convert it into an iterator in places where that is necessary like in a for loop. 
     // Calling iter explicitly would not be an error and would lead to the same running code, but this implicit conversion to an iterator is common in Rust code.
@@ -136,14 +139,31 @@ pub fn print() {
     output_sequence_ref(&vector_numbers);
     let array_numbers = [1, 2, 3, 4, 5];
     output_sequence_ref(&array_numbers);
+
+    let numbers_seq = generate_sequence(limit);
+    output_sequence_ref(&numbers_seq);
+
+    let numbers_seq_collect = generate_sequence_collect(limit);
+    output_sequence_ref(&numbers_seq_collect);
 }
 
 /**
- * Different modes of passing arguments to functions.
- * Function can temporarily have acces to variable (borrowing) or have ownership of a variable.
+ * Functions
+ * Inputs passed by value.
+ * Therefore, ownership is also moved into the function.
+ *
+ * Modes: Different modes of passing arguments to functions.
+ * Borrowing: 
+ *  - Function can temporarily have acces to variable (borrowing).
+ * Ownership:
+ *  - Functions can have ownership of a variable.
+ *  - Default function take input by value and hence ownership of the variable is moved into the function.
+ * 
  * Another dimension is whether the function can mutate the input.
- * Default function take input by value and hence ownership of the variable is moved into the function.
- * The exception to this rule being if the type implements a special trait called Copy, in which case the input is copied into the function and therefore the caller still maintains ownership of the variable. 
+ * 
+ * Copy
+ * Trait
+ * If type implements a special trait called Copy, input is copied into the function and therefore the caller still maintains ownership of the variable. 
  * If the element type of an array implements the Copy trait, then the array type also implements the Copy trait.
  * While arrays implement the Copy trait if their elements do, Vec does not.
  */
@@ -162,6 +182,7 @@ fn output_sequence_vec(numbers: Vec<u8>) {
 }
 
 /**
+ * A type signature that works for both arrays and vectors
  * [u8] slice of u8 values. 
  * Unknown size at compile time. 
  * Functions cannot take arguments of an unknown size. 
@@ -170,10 +191,70 @@ fn output_sequence_vec(numbers: Vec<u8>) {
  * Allows access to slice of unknown size by passing a reference to the slice.
  * &[u8] reference to a slice of u8 values which has a known size at compile time.
  *
+ * Size is equal to size of the pointer plus the length of the slice,
+ * therefore, it is know at compile time.
+ *
+ * Note slices convert automatically into iterators just like vectors, therefore no call to iter().
+ *
+ * & before variable name creates a slice that represents read-only access to the entire sequence for both the vector and array.
+ * Idiomatic Rust takes slices as arguments in most cases where one needs only to read the collection.
+ * This is particularly true for strings which we will cover later.
+ *
+ * The major difference here is that we are no longer transferring ownership into the function output_sequence instead we are lending read-only access to that function.
+ * The data is only borrowed for the duration of the function call.
  */
 fn output_sequence_ref(numbers: &[u8]) {
     println!("output_sequence_ref");
     for n in numbers {
         println!("{}", n);
     }
+}
+
+fn generate_sequence(limit: u8) -> Vec<u8> {
+    // Unlike in some other languages, new is not special but rather has become by convention 
+    // the name of the function that returns a new instance of a type. 
+    //
+    // You can write a function called new which does something else and it would compile just fine,
+    // but it would go against the standard way of doing things.
+    //
+    // By default a vector created with new, is the same as one created with vec![], and does not allocate.
+    // Therefore, unless you actually put something into a vector it does not use any memory.
+    //
+    // Mutability is a property of the variable or reference not of the object itself.
+    let mut numbers = Vec::new();
+
+    // iterator is a Range object, in particular an InclusiveRange. 
+    // Ranges can be constructed with using the syntax
+    // 
+    // Inclusive start, exclusive end
+    // start..end
+    // let numbers = [1, 2, 3, 4, 5]; 
+    // let subset = &numbers[1..3]; // 2, 3
+    //
+    // Inclusive start, inclusive end use =end
+    // start..=end.
+    for n in 1..=limit {
+        // Iterating over this range, we push each value onto the end of our vector which causes 
+        // heap allocations every time there is not enough capacity to extend the length.
+        numbers.push(n);
+    }
+    // The final expression in a function is implicitly returned so there is no need for an explicit return statement
+    // The expression that evaluates to the vector numbers is written without a semicolon and means to return that value.
+    // If we had written a semicolon, that would be a statement whose value is () which is not what you want to return.
+    // This is a common error so the compiler is smart enough to tell you what to fix, but it is nonetheless an error. 
+    // You can use a return statement to return early from a function, but using the last expression of the block as the implicit return is idiomatic Rust.
+    numbers
+}
+
+// A Shorter Version with collect
+// This function can be used to turn any iterator into basically any collection.
+fn generate_sequence_collect(limit: u8) -> Vec<u8> {
+    // Collect is a generic function over the return type, so the caller gets to determine what they want. 
+    // Here because we return the result of calling collect from our function, type inference sees that the return type needs to be a Vec<u8> and therefore ensures that collect generates that collection.
+    // turn one collection into another collection
+    // turning a range into a vector
+    //
+    // alterantive syntax ::<>, you may see referred to as the “turbofish”
+    // collect::<SomeType>()
+    (1..=limit).collect()
 }

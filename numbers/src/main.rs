@@ -22,5 +22,5 @@ fn main() {
     // e.g. std::thread::current
     numbers::say_hello();
 
-    numbers::print();
+    numbers::print(5);
 }
