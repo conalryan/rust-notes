@@ -83,4 +83,76 @@ and it is how the CLI knows which migrations have or have not run.
 - Second, file `src/schema.rs` is updated with Rust code which Diesel uses to 
 understand the state of your database.
 
+Working with Diesel requires some macros to be in scope which is why we have the macro_use attribute on the extern crate diesel item.
+
+Modules and code organization
+--------------------------------------------------------------------------------
+
+"...cost of spreading code across multiple files was higher than the benefit."
+cr. What is the tipping point? e.g. for Angular lazy loading
+
+Rust has a module system to organize code within a crate for readability and ease 
+of reuse as well as to control privacy of items. 
+You can declare modules within a file with the `mod` keyword followed by a name, 
+followed by curly braces to contain the code for the module:
+```rust
+mod a_module {
+  pub fn some_function() {} 
+  fn hidden_function() {}
+  
+  mod inner_module {
+    pub fn inner_function() {}
+    fn inner_hidden_function() {}
+  } 
+}
+
+fn do_things() { 
+  a_module::some_function(); 
+  a_module::inner_module::inner_function();
+}
+```
+
+We can also spread modules over files and directories which helps with file size 
+and makes working with large projects much easier. 
+Instead of declaring a module inline, you can simply refer to it via:
+`mod a_module;`
+
+The language then expects to find a file `a_module.rs` or a file `mod.rs` inside 
+a directory with the name of the module, i.e. `a_module/mod.rs`.
+Recommended style:
+`
+src/
+    ├── a_module
+    │   └── inner_module.rs
+    ├── a_module.rs
+    └── lib.rs
+`
+
+Errors
+--------------------------------------------------------------------------------
+The first module we are going to deal with is the errors module. 
+We define our own error type which unifies our notion of error states across different 
+parts of the application. This encapsulates the different types of errors that 
+can happen so we can explicitly handle those scenarios and can avoid generic 500 errors as much as possible. 
+We also use this type to translate errors from other libraries to our own domain specific error type.
+
+Straightforward route of creating an enum for our error type. 
+In this context encountering an error means we enter one of a small number of 
+states where we want to return an error code and a message instead of continuing to process the request. 
+This is a natural use case for an enumerated type. We define the type as:
+`src/errors.rs`
+```rust
+#[derive(Debug)]
+pub enum AppError {
+  RecordAlreadyExists,
+  RecordNotFound, 
+  DatabaseError(diesel::result::Error), 
+  // OperationCanceled is related to a actix_web error having to do with an async operation which we will explain later.
+  OperationCanceled,
+}
+```
+
+These are the only error states that we going to explicitly handle. 
+As you build up your application and rely on more libraries that could fail you 
+can add variants to this type to capture those errors if you want to deal with them this way.
 
