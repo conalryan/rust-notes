@@ -156,3 +156,49 @@ These are the only error states that we going to explicitly handle.
 As you build up your application and rely on more libraries that could fail you 
 can add variants to this type to capture those errors if you want to deal with them this way.
 
+
+pub(self) is equivalent to nothing at all, i.e. pub(self) mod foo is the same as mod foo which is actually private. Why? The answer lies in macros that can generate code with visibility specifiers. If a macro outputs code like pub($arg) where $arg
+Even More Web 121
+is an input argument, you might want to specify that the item should be private, so passing self as the argument achieves that goal.
+
+CRUD Examples
+--------------------------------------------------------------------------------
+Create user
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users -d '{"username":"Frank"}'`
+
+{
+  "id": 1,
+  "username": "Frank"
+}
+
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:89\ 98/users -d '{"username":"Bob"}'`
+
+{
+  "id": 2,
+  "username": "Bob"
+}
+
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:89\ 98/users -d '{"username":"Bob"}'`
+
+{
+  "err": "This record violates a unique constraint"
+}
+
+Lookup User by name
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/users/find/Frank`
+{
+  "id": 1,
+  "username": "Frank"
+}
+
+Lookup User by primary key
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/users/1`
+{
+  "id": 1,
+  "username": "Frank"
+}
+
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/users/find/Steve`
+{
+  "err": "This record does not exist"
+}

@@ -20,6 +20,7 @@ fn main() -> std::io::Result<()> {
     // We pass this URL to the run call of our app which kicks off everything.
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let app = blog_actix::Blog::ew(8998);
-    app.run(database_url);
+    let app = blog_actix::Blog::new(8998);
+    app.run(database_url)
 }
+

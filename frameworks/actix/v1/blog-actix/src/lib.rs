@@ -20,7 +20,7 @@ use diesel::r2d2::{self, ConnectionManager};
 // but underusing them can also lead to noisy code.
 type Pool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
 
-mod errors:
+mod errors;
 mod models;
 mod routes;
 mod schema;
