@@ -11,6 +11,8 @@ use actix_web::HttpResponse;
 // is an input argument, you might want to specify that the item should be private, so passing self as the argument achieves that goal.
 
 pub(super) mod users;
+pub(super) mod posts;
+pub(super) mod comments;
 
 fn convert<T, E>(res: Result<T, E>) -> Result<HttpResponse, AppError>
 // We put trait bounds on the generic parameters to specify that we can only accept input arguments 

@@ -171,14 +171,14 @@ Create user
   "username": "Frank"
 }
 
-`curl -s -H 'Content-Type: application/json' -X POST http://localhost:89\ 98/users -d '{"username":"Bob"}'`
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users -d '{"username":"Bob"}'`
 
 {
   "id": 2,
   "username": "Bob"
 }
 
-`curl -s -H 'Content-Type: application/json' -X POST http://localhost:89\ 98/users -d '{"username":"Bob"}'`
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users -d '{"username":"Bob"}'`
 
 {
   "err": "This record violates a unique constraint"
@@ -202,3 +202,96 @@ Lookup User by primary key
 {
   "err": "This record does not exist"
 }
+
+Extending data model
+--------------------------------------------------------------------------------
+
+`diesel migration generate create_posts`
+
+migrations/up.sql
+`
+CREATE TABLE posts (
+  id INTEGER PRIMARY KEY NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users (id),
+  title VARCHAR NOT NULL,
+  body TEXT NOT NULL,
+  published BOOLEAN NOT NULL DEFAULT 0
+)
+`
+
+migrations/down.sql
+`DROP TABLE posts`
+
+Run migration. Diesel will update src/schema.rs
+`diesel migration run`
+
+Extending further
+--------------------------------------------------------------------------------
+
+`diesel migration generate create_comments`
+
+`
+CREATE TABLE comments (
+  id INTEGER PRIMARY KEY NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users (id),
+  post_id INTEGER NOT NULL REFERENCES posts (id),
+  body TEXT NOT NULL
+)
+`
+
+Run migration. Diesel will update src/schema.rs
+`diesel migration run`
+
+Create a post
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users/1/posts -d '{"title":"Frank says hello","body":"Hello friends"\ }'`
+{
+  "id": 1,
+  "user_id": 1,
+  "title": "Frank says hello",
+  "body": "Hello friends",
+  "published": false
+}
+Create a post
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users/2/posts -d '{"title":"Bob is here too","body":"Hello friends, \ also"}'`
+{
+  "id": 2,
+  "user_id": 2,
+  "title": "Bob is here too",
+  "body": "Hello friends, also",
+  "published": false
+}
+
+Publish a post
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/posts/1/publish`
+{
+  "id": 1,
+  "user_id": 1,
+  "title": "Frank says hello",
+  "body": "Hello friends",
+  "published": true
+}
+Comment on a post
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/posts/1/comments -d '{"user_id":2,"body":"Hi Frank, this is your fri\ end Bob"}'`
+{
+  "id": 1,
+  "user_id": 2,
+  "post_id": 1,
+  "body": "Hi Frank, this is your friend Bob"
+}
+List all posts
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/post`
+
+See posts
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/users/1/posts`
+
+Publish other post
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/posts/2/publish`
+
+List all posts again
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/posts`
+
+See users comments
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/users/2/comments`
+
+See post comments
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/posts/1/comments`

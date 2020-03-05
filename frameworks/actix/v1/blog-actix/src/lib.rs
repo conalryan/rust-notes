@@ -66,6 +66,8 @@ impl Blog {
                 // a submodule called users, and that submodule needs to publicly 
                 // expose a function called configure.
                 .configure(routes::users::configure)
+                .configure(routes::posts::configure)
+                .configure(routes::comments::configure)
         })
         .bind(("127.0.0.1", self.port))?
         .run()
