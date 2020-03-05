@@ -243,7 +243,7 @@ Run migration. Diesel will update src/schema.rs
 `diesel migration run`
 
 Create a post
-`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users/1/posts -d '{"title":"Frank says hello","body":"Hello friends"\ }'`
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users/1/posts -d '{"title":"Frank says hello","body":"Hello friends" }'`
 {
   "id": 1,
   "user_id": 1,
@@ -252,14 +252,7 @@ Create a post
   "published": false
 }
 Create a post
-`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users/2/posts -d '{"title":"Bob is here too","body":"Hello friends, \ also"}'`
-{
-  "id": 2,
-  "user_id": 2,
-  "title": "Bob is here too",
-  "body": "Hello friends, also",
-  "published": false
-}
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/users/2/posts -d '{"title":"Bob is here too","body":"Hello friends, also"}'`
 
 Publish a post
 `curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/posts/1/publish`
@@ -271,7 +264,7 @@ Publish a post
   "published": true
 }
 Comment on a post
-`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/posts/1/comments -d '{"user_id":2,"body":"Hi Frank, this is your fri\ end Bob"}'`
+`curl -s -H 'Content-Type: application/json' -X POST http://localhost:8998/posts/1/comments -d '{"user_id":2,"body":"Hi Frank, this is your friend Bob"}'`
 {
   "id": 1,
   "user_id": 2,
@@ -279,7 +272,7 @@ Comment on a post
   "body": "Hi Frank, this is your friend Bob"
 }
 List all posts
-`curl -s -H 'Content-Type: application/json' http://localhost:8998/post`
+`curl -s -H 'Content-Type: application/json' http://localhost:8998/posts`
 
 See posts
 `curl -s -H 'Content-Type: application/json' http://localhost:8998/users/1/posts`
