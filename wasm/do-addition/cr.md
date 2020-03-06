@@ -44,3 +44,10 @@ We make this script executable as well:
 
 `./serve.py`
 
+The Rust compiler knows how to turn your Rust code into the Wasm format. 
+The JavaScript engine in the browser knows how to load Wasm code. And, finally, 
+there is some execution engine in the browser which an execute that Wasm code when called via the JavaScript interface. 
+The one caveat is that the only Rust functions which are valid to expose to Wasm only deal with integers and floating point numbers.
+
+Working with complex types
+171

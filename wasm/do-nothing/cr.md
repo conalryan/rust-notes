@@ -52,17 +52,3 @@ Let’s check the size of this optimized binary:
 We got down to 71 bytes. That is about as good as we can do. It is possible to manually shave a few more bytes off, 
 but for all intents and purposes this is the baseline that we will build up from. 
 This is incredibly small in the JavaScript ecosystem, but we are also not doing anything.
-
-`cargo new --lib do-addition`
-
-Cargo.toml
-```toml
-[package]
-name = "do-addition"
-version = "0.1.0"
-authors = ["YourName<you@example.com>"]
-edition = "2018"
-
-[lib]
-crate-type = ["cdylib"]
-```
