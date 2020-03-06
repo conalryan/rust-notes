@@ -99,7 +99,7 @@ fn print_number(num: Option<i32>) { match num {
   }
 }
 fn main() {
-let x = Some(42); let y = None;
+  let x = Some(42); let y = None;
   print_number(x);
   print_number(y);
 }
@@ -249,3 +249,57 @@ The Actix project is actually a group of projects which define an actor system a
 
 It recently hit the 1.0 milestone which should bring some much needed stability to the ecosystem. Additionally, it has been at the top of the Tech Empower web framework benchmarks30. Even if those are artificial benchmarks, it still points to the performance potential possible.
 
+Into to Web Assembly
+--------------------------------------------------------------------------------
+Modern web browsers expose a set of APIs related to the user interface and user interactions 
+(DOM, CSS, WebGL, etc.) as well as an execution environment for working with these APIs which executes JavaScript.
+
+WebAssembly, abbreviated Wasm, is a type of code which was created to be run inside 
+this browser execution environment as an additional language alongside JavaScript.
+
+Rather Wasm is intended to be a compilation target for higher level languages.
+
+although the original intent was to introduce a low level language to the web, the design allows Wasm to be used in a variety of other contexts as well.
+
+In more traditional contexts, languages that are translated to machine code and run directly on host hardware are harder to secure in this fashion. As Wasm is designed to be translated to machine code it provides near native performance. There are still a few performance penalties to the environment that differentiate Wasm from truly native code, but the gap is continuing to narrow as the platform matures.
+
+The representation of Wasm code is designed so that the process of transmitting, decoding, validating, and compiling is streamable, parallelizable, and efficient.
+
+### Type System
+Wasm has four value types, abbreviated valtype:
+- i32
+- i64
+- f32
+- f64
+The integer types are not signed or unsigned in the spec even.
+
+Wasm has functions which map a vector of value types to a vector of value types:
+`function = vec(valtype) -> vec(valtype)`
+
+However, the return type vector is currently limited to be of length at most 1. 
+In other words, Wasm functions can take 0 or more arguments and can either return nothing or return a single value. 
+This restriction may be removed in the future.
+
+### Memory
+Wasm has a linear memory model which is just a contiguous vector of raw bytes. Your code can grow this memory but not shrink it. Data in the memory region is accessed via load and store operations based on an aligned offset from the beginning of the memory region. Access via an offset from the beginning of the region is where the linear name comes from. This memory region is exposed by a Wasm module and can be accessed directly in JavaScript. Sharing memory is dangerous but is the primary way by which JavaScript and Wasm can interact performantly.
+
+### Execution
+The WebAssembly computational model is based on a stack machine. This means that every operation can be modeled by maybe popping some values off a virtual stack, possibly doing something with these values, and then maybe pushing some values onto this stack.
+
+### Rust in the browser
+Rust uses the *LLVM* project as the backend for its compiler.
+
+This means that the Rust compiler does all of the Rust specific work necessary to build an 
+intermediate representation (*IR*) of your code which is understood by LLVM.
+
+LLVM is used to turn that IR into machine code for the particular target of your choosing.
+
+*Target*
+Targets in LLVM can roughly be thought of as architectures, such as *x86_64* or *armv7*, Wasm is just another target. 
+This is also one of the ways that C++ supports Wasm through the Clang compiler which is part of the LLVM project.
+The target triple for wasm is `wasm32-unknown-unknown`. 
+The target triples have the form `<arch>-<vendor>-<sys>`, for example `x86_64-apple-darwin` is the default triple for a modern Macbook. 
+The `unknown` vendor and system mean to use the defaults for the specific architecture.
+
+Install
+`rustup target add wasm32-unknown-unknown`
