@@ -14,10 +14,10 @@ crate-type = ["cdylib"]
 
 build.sh
 ```bash
-#!/bin/bash 2
+#!/bin/bash
 
-WABT_BIN=$HOME/Code/wabt/bin
-BINARYEN_BIN=$HOME/Code/binaryen/bin
+WABT_BIN=$WABT/bin
+BINARYEN_BIN=$BINARYEN/bin
 TARGET=wasm32-unknown-unknown
 
 NAME=do_addition
@@ -41,6 +41,10 @@ If you have Python installed on your system, you can run a simple server with:
 Note the one change from the simplest Python file server is to explicitly set the MIME type for .wasm files. This makes sure browsers handle these files correctly.
 We make this script executable as well:
 `chmod +x serve.py`
+
+`ls -lh www/do_addition.wasm`
+
+*101 bytes*
 
 `./serve.py`
 

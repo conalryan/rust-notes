@@ -1,7 +1,7 @@
 #!/bin/bash
 
-WABT_BIN=$HOME/Code/wabt/bin
-BINARYEN_BIN=$HOME/Code/binaryen/bin
+WABT_BIN=$WABT/bin
+BINARYEN_BIN=$BINARYEN/bin
 TARGET=wasm32-unknown-unknown
 
 NAME=do_addition
