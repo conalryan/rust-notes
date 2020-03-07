@@ -29,26 +29,32 @@ By default, Cargo puts the build artifacts in `target/<target-triple>/<mode>/` o
 module. 
 But how big is it:
 `ls -lh target/wasm32-unknown-unknown/release/do_nothing.wasm`
--rwxr-xr-x 2 led staff 1.4M Jul 8 21:55 target/wasm32-unknown-unkn\ own/release/do_nothing.wasm
 
-1.4M to do nothing! That’s insane! But it turns out it is because the output binary still includes debug symbols.
+*1.7M* to do nothing! That’s insane! But it turns out it is because the output binary still includes debug symbols.
 
-Stripping out debug symbols can be done with a tool called `wasm-strip` which is part of the WebAssembly Binary Toolkit (WABT)39.
+Stripping out debug symbols can be done with a tool called `wasm-strip` which is part of the 
+[WebAssembly Binary Toolkit (WABT)](https://github.com/WebAssembly/wabt).
 The repository includes instructions on how to build that suite of tools. 
 Assuming you have that installed somewhere on your path, we can run it to strip our binary:
-`wasm-strip target/wasm32-unknown-unknown/release/do_nothing.wasm`
+`$WABT/bin/wasm-strip target/wasm32-unknown-unknown/release/do_nothing.wasm`
 
 We can then check the size of our new binary:
 `ls -lh target/wasm32-unknown-unknown/release/do_nothing.wasm`
--rwxr-xr-x 2 led staff 102B Jul 8 22:01 target/wasm32-unknown-unkn\ own/release/do_nothing.wasm
 
-A much more reasonable 102 bytes. We can make this better by running one more tool which is to actually optimize the binary, wasm-opt as part of the Binaryen library40. Again this repository has instructions for how to build and install this suite of tools. Running this against our binary requires us to specify a new file to put the output:
-`wasm-opt -o do_nothing_opt.wasm -Oz target/wasm32-unknown-unknown/relea\ se/do_nothing.wasm`
+A much more reasonable *86 bytes*. 
+
+We can make this better by running one more tool which is to actually optimize the binary, 
+`wasm-opt` as part of the [Binaryen library](https://github.com/WebAssembly/binaryen).
+
+Again this repository has instructions for how to build and install this suite of tools. 
+Running this against our binary requires us to specify a new file to put the output:
+`$BINARYEN/bin/wasm-opt -o do_nothing_opt.wasm -Oz target/wasm32-unknown-unknown/release/do_nothing.wasm`
 
 Let’s check the size of this optimized binary:
 `ls -lh do_nothing_opt.wasm`
--rw-r--r--  1 led  staff    71B Jul  8 22:04 do_nothing_opt.wasm
 
-We got down to 71 bytes. That is about as good as we can do. It is possible to manually shave a few more bytes off, 
+We got down to *71 bytes*. 
+
+That is about as good as we can do. It is possible to manually shave a few more bytes off, 
 but for all intents and purposes this is the baseline that we will build up from. 
 This is incredibly small in the JavaScript ecosystem, but we are also not doing anything.
