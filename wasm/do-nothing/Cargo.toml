@@ -1,7 +1,7 @@
 [package]
 name = "do-nothing"
 version = "0.1.0"
-authors = ["You Me <youme@email.com>"]
+authors = ["Your Name <you@example.com>"]
 edition = "2018"
 
 # We need to specify that our library will be a C dynamic library as this is the type of compilation format that Wasm uses.
