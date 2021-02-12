@@ -1,7 +1,7 @@
 [package]
 name = "blog-actix"
 version = "0.1.0"
-authors = ["Conal RYAN <conaleryan@gmail.com>"]
+authors = ["You Me <youme@email.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -19,37 +19,37 @@ diesel={version="^1.1.0",features=["sqlite","r2d2"]}
 dotenv="0.10"
 
 # cr. Pseudo Tree Shaking
-# Cargo supports the concept of features which allow crates to 
-# specify groups of functionality that you can select when you 
-# depend on a crate. 
+# Cargo supports the concept of features which allow crates to
+# specify groups of functionality that you can select when you
+# depend on a crate.
 #
-# This is typically used for conditionally including transitive 
+# This is typically used for conditionally including transitive
 # dependencies and conditional compilation to either include or
-# exclude code based on what you do or don’t need. 
+# exclude code based on what you do or don’t need.
 #
-# Good crates allow you to pick and choose only what you want 
-# to minimize compilation times and binary sizes. 
+# Good crates allow you to pick and choose only what you want
+# to minimize compilation times and binary sizes.
 #
-# The Rust compiler can do some work to remove code that is 
-# unused in your final binary but using features is one way to 
+# The Rust compiler can do some work to remove code that is
+# unused in your final binary but using features is one way to
 # ensure this happens and make it explicitly what you are using.
 
 # r2d2
 # Any reasonable production system will use a connection pool for interacting with a database
-# Opening a new database connection every time one is needed is 
+# Opening a new database connection every time one is needed is
 # both inefficient and can lead to resource exhaustion under high
-# traffic conditions. 
+# traffic conditions.
 #
-# A connection pool maintains a set of open connections to a 
+# A connection pool maintains a set of open connections to a
 # database, handing them out for repeated use.
 
 # dotenv
-# Tool for managing environ- ment variables. 
-# By default Dotenv looks for a file named .env in the current 
-# directory which lists environment variables to load. 
-# 
-# As we will need it later, let’s create this file with one 
-# variable DATABASE_URL with a file URL to a file in the 
+# Tool for managing environ- ment variables.
+# By default Dotenv looks for a file named .env in the current
+# directory which lists environment variables to load.
+#
+# As we will need it later, let’s create this file with one
+# variable DATABASE_URL with a file URL to a file in the
 # current directory which will hold our Sqlite database:
 # turn off the default and then turn on only Sqlite support via --features sqlite.
 # `cargo install diesel_cli --no-default-features --features sqlite`

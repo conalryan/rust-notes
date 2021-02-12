@@ -4,7 +4,7 @@
 # Compiler knows to look for hyphen if an underscore cannot be found.
 name = "messages-actix-stateful"
 version = "0.1.0"
-authors = ["Conal RYAN <conaleryan@gmail.com>"]
+authors = ["You Me <youme@email.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
