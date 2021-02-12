@@ -10,11 +10,16 @@
 #
 # Binary projects are also called crates.
 # A crate can contain both a library and an executable.
-# Common practice to create dual library/binary crates even when the primary intention of a project is to produce an executable.
+# Common practice is to create dual library/binary crates even when the primary intention of a project is to produce an executable.
 # This can have positive effects on the API design of your code knowing that it should be suitable for external consumption.
-# The binary part of the crate is typically responsible for argument parsing and configuration, and then calls into the functionality exposed by the library
 #
-# cr. Why isn't it called [crate]?
+# APP:
+# - The binary part of the crate is typically responsible for argument parsing and configuration.
+#
+# LIB:
+# - App calls into the functionality exposed by the library.
+#
+# cr. Why isn't it called [crate] instead of [package]?
 [package]
 name = "numbers"
 version = "0.1.0"
