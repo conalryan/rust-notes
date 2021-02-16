@@ -5,12 +5,12 @@ Fullstack Rust by Andrew Weiss
 Introduction
 --------------------------------------------------------------------------------
 We are currently in the fifth era of programming language evolution.
-This is an era where languages have been able to take all of the learnings since the 1950s and 
+This is an era where languages have been able to take all of the learnings since the 1950s and
 incorporate the best parts into languages each with its own cohesive vision.
 
 cr. What are the other four eras of programming language evolution?
 
-cr. Every language has been able to "take all of the learnings since the 1950s and 
+cr. Every language has been able to "take all of the learnings since the 1950s and
 incorporate the best parts into languages each with its own cohesive vision."
 
 With tools like LLVM and the explosion of open source, creating a language has never been easier.
@@ -67,7 +67,7 @@ cr. Cool!
 
 Type System
 --------------------------------------------------------------------------------
-The type system of Rust is influenced by the long lineage of functional programming languages such as ML and Haskell. It is static, nominal, strong, and for the most part inferred. 
+The type system of Rust is influenced by the long lineage of functional programming languages such as ML and Haskell. It is static, nominal, strong, and for the most part inferred.
 
 A type system is often called expressive if it is easy to encode your ideas.
 
@@ -172,8 +172,8 @@ Rustfmt
 --------------------------------------------------------------------------------
 Rust has an official code formatter called rustfmt16.
 This was a project that started life in the community and eventually got official status.
-However, it is not as seriously official as `gofmt` for the Go language. 
-You can configure rustfmt based on a couple attributes. 
+However, it is not as seriously official as `gofmt` for the Go language.
+You can configure rustfmt based on a couple attributes.
 
 Documentation
 --------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ First App
 `cargo new numbers`
 Created binary (application) `numbers` package
 
-Running `cargo new project_name` by default is equivalent to `cargo new project_name --bin`which generates a binary project. 
+Running `cargo new project_name` by default is equivalent to `cargo new project_name --bin`which generates a binary project.
 
 Alternatively, we could have run `cargo new project_name --lib` to generate a library project.
 
@@ -241,7 +241,6 @@ There are a few different layers to the web programming stack. Primarily we are 
 Hyper is a low level HTTP library built on even lower level libraries for building network services.
 Currently most web frameworks use Hyper internally for handling the actual HTTP requests.
 
-
 It can be used to build both HTTP clients and servers. However, there is a bit more boilerplate than you might want to write yourself when you want to focus on building an application. Therefore, we will use a library at a higher level of abstraction which still allows us to take advantage of what Hyper offers.
 
 ### Actix
@@ -251,10 +250,10 @@ It recently hit the 1.0 milestone which should bring some much needed stability 
 
 Into to Web Assembly
 --------------------------------------------------------------------------------
-Modern web browsers expose a set of APIs related to the user interface and user interactions 
+Modern web browsers expose a set of APIs related to the user interface and user interactions
 (DOM, CSS, WebGL, etc.) as well as an execution environment for working with these APIs which executes JavaScript.
 
-WebAssembly, abbreviated Wasm, is a type of code which was created to be run inside 
+WebAssembly, abbreviated Wasm, is a type of code which was created to be run inside
 this browser execution environment as an additional language alongside JavaScript.
 
 Rather Wasm is intended to be a compilation target for higher level languages.
@@ -276,8 +275,8 @@ The integer types are not signed or unsigned in the spec even.
 Wasm has functions which map a vector of value types to a vector of value types:
 `function = vec(valtype) -> vec(valtype)`
 
-However, the return type vector is currently limited to be of length at most 1. 
-In other words, Wasm functions can take 0 or more arguments and can either return nothing or return a single value. 
+However, the return type vector is currently limited to be of length at most 1.
+In other words, Wasm functions can take 0 or more arguments and can either return nothing or return a single value.
 This restriction may be removed in the future.
 
 ### Memory
@@ -289,16 +288,16 @@ The WebAssembly computational model is based on a stack machine. This means that
 ### Rust in the browser
 Rust uses the *LLVM* project as the backend for its compiler.
 
-This means that the Rust compiler does all of the Rust specific work necessary to build an 
+This means that the Rust compiler does all of the Rust specific work necessary to build an
 intermediate representation (*IR*) of your code which is understood by LLVM.
 
 LLVM is used to turn that IR into machine code for the particular target of your choosing.
 
 *Target*
-Targets in LLVM can roughly be thought of as architectures, such as *x86_64* or *armv7*, Wasm is just another target. 
+Targets in LLVM can roughly be thought of as architectures, such as *x86_64* or *armv7*, Wasm is just another target.
 This is also one of the ways that C++ supports Wasm through the Clang compiler which is part of the LLVM project.
-The target triple for wasm is `wasm32-unknown-unknown`. 
-The target triples have the form `<arch>-<vendor>-<sys>`, for example `x86_64-apple-darwin` is the default triple for a modern Macbook. 
+The target triple for wasm is `wasm32-unknown-unknown`.
+The target triples have the form `<arch>-<vendor>-<sys>`, for example `x86_64-apple-darwin` is the default triple for a modern Macbook.
 The `unknown` vendor and system mean to use the defaults for the specific architecture.
 
 Install
