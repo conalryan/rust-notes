@@ -1,9 +1,9 @@
-// #[macro_use]
-// extern crate actix_web;
+#[macro_use]
+extern crate actix_web;
 
 use actix_web::{
     error::{Error, InternalError, JsonPayloadError},
-    get, middleware, post, web, App, HttpRequest, HttpResponse, HttpServer, Result
+    middleware, web, App, HttpRequest, HttpResponse, HttpServer, Result
 };
 use serde::{Deserialize, Serialize};
 use std::cell::Cell;
