@@ -125,13 +125,98 @@ impl MessageApp {
     // }
     // result.unwrap().workers(8).run()
     .bind(addr)?
+    .workers(8)
     .run()
     .await
   }
 }
 
 // http://localhost:8080/22/bob/index.html
-#[get("/{id}/{name}/index.html")]
-async fn index(web::Path((id, name)): web::Path<(u32, String)>) -> impl Responder {
-    format!("Hello {}! id:{}", name, id)
+// #[get("/{id}/{name}/index.html")]
+// async fn index(web::Path((id, name)): web::Path<(u32, String)>) -> impl Responder {
+//     format!("Hello {}! id:{}", name, id)
+// }
+
+// Attributes
+// Attributes are the way of attaching metadata to a variety of things in the language.
+// They can be attached to modules as a whole, structs, functions, and several other constructs.
+// They can attach to the thing they are defined within using the syntax #![...] with a ! after the #.
+
+fn some_unused_variable() {
+  // The allow attribute is used to turn off a lint warning for the entity that contains the
+  // attribute which is the function some_unused_variable in this example.
+  #![allow(unused_variables)]
+  let x = ();
 }
+
+
+// Derived Attribute
+// The derive attribute is probably the most common attribute you will encounter.
+// It allows you to implement traits for types without having to do any more work provided
+// the type meets the requirements for the trait to be derived.
+//
+// Most structs will at the very least will derive Debug which allows the struct to be printed
+// using the {:?} debug format specifier.
+// Note all builtin types implement Debug trait.
+//
+// Now that we have derived Serialize any instance of our struct can be serialized by serde into
+// the output format of our choice.
+#[derive(Serialize)]
+struct IndexResponse {
+  message: String,
+}
+
+// Handlers in Rust
+// Most of the work in defining a handler in all of the Rust web ecosystem is centered around defining
+// the input and output types. Current idiomatic design focuses on the
+// type signature explaining what the function uses.
+//
+// The alternative would be handlers that all
+// take a generic request as input and return generic response as output
+// and then the internals of the function need to be introspected to determine what a handler does.
+//
+// curl localhost:8080
+// curl -H "hello:actix" localhost:8080
+#[get("/")]
+async fn index(req:HttpRequest) -> Result<web::Json<IndexResponse>> {
+
+  // Working with Options
+  // Option<T> is an enum in the standard library with two variants: Some(T) and None.
+  //
+  // The idea of Option is to represent the possibility of something not always existing and
+  // hence replaces the need for the concept of null found in many other programming languages.
+  // The major distinction between null in other languages and Option in Rust is that an Option
+  // is an explicit type that has a None variant that you must deal with and thus the concept of
+  // null cannot inhabit other types.
+  //
+  // In many other languages null can be the value of nearly every type of variable.
+  // Option is the other main error handling primitive that complements Result.
+  // Wherein Result carries an error value, sometimes you either have something or you don’t
+  // and in those scenarios Option is the more suitable type to use
+  //
+  // headers.get("hello") will return an  Option<&HeaderValue>
+  let hello = req
+      .headers()
+      .get("hello")
+      // and_then is a no-op on None
+      .and_then(|v| v.to_str().ok())
+      .unwrap_or_else(|| "world");
+
+  Ok(web::Json(IndexResponse {
+      message: hello.to_owned(),
+  }))
+}
+
+
+// String
+// Most primitive string type is named str and is known as a string slice.
+// This is a slice in the same sense that [i32] is a slice of signed 32-bit integers.
+// A string slice is a slice of bytes, i.e. it has type [u8] and it also is valid Unicode.
+//
+// The str type is almost always encountered as the borrowed variant &str which is a reference to a valid Unicode byte array.
+// The reference means that it points to memory owned by someone else.
+// In particular, static string literals are represented with type &'static str
+// where the notation &'static means a reference to something with a static lifetime.
+// The static lifetime is a special lifetime in Rust which is the entire life of your program.
+// Static strings are compiled into your binary and are therefore owned by the binary.
+// The other type of string has type String which is a heap allocated string, i.e. it is a string you own.
