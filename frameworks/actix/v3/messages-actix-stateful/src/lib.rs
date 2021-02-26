@@ -1,8 +1,15 @@
-use actix_web::{get, middleware, web, App, HttpRequest, HttpServer, Responder, Result};
-use serde::Serialize;
+use actix_web::{
+  error::{Error, InternalError, JsonPayloadError},
+  get, middleware, post, web, App, HttpRequest, HttpResponse, HttpServer, Result
+};
+use serde::{Deserialize, Serialize};
 use std::cell::Cell;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
+
+// The syntax is the character r followed by zero or more # characters followed by an opening " character.
+// To terminate the string you use a closing " character followed by the same number of # characters you used at the beginning.
+const LOG_FORMAT: &'static str = r#""%r" %s %b "%{User-Agent}i" %D"#;
 
 // Static versus const
 // Both live for entirety of program.
@@ -21,26 +28,28 @@ use std::sync::{Arc, Mutex};
 // We will create an atomic usize to track this count of workers because it needs to be thread-safe
 static SERVER_COUNTER: AtomicUsize = AtomicUsize::new(0);
 
-// Each worker thread gets its own instance of this state struct.
-// Actix takes an application factory because it will create many instances of the application,
-// and therefore many instances of the state struct.
-//
-// Rust has a pattern for mutating a piece of data inside a struct which itself is immutable known as interior mutability.
-// Two special types enable this:
-//
-// 1. Cell
-// Cell implements interior mutability by moving values in and out of a shared memory location.
-//
-// 2. RefCell (cr. why use this, over cell?)
-// RefCell implements interior mutability by using borrow checking at runtime to enforce the constraint
-// that only one mutable reference can be live at any given time.
-// If one tries to mutably borrow a RefCell that is already mutably borrowed the calling thread will panic.
-// cr. having a solution that results in runtime errors seem very brittle and limited.
-//
-// Cell and RefCell are not needed that often in everyday Rust
 struct AppState {
   server_id: usize,
+
+  // Each worker thread gets its own instance of this state struct.
+  // Actix takes an application factory because it will create many instances of the application,
+  // and therefore many instances of the state struct.
+  //
+  // Rust has a pattern for mutating a piece of data inside a struct which itself is immutable known as interior mutability.
+  // Two special types enable this:
+  //
+  // 1. Cell
+  // Cell implements interior mutability by moving values in and out of a shared memory location.
+  //
+  // 2. RefCell (cr. why use this instead cell? Cell seems superior)
+  // RefCell implements interior mutability by using borrow checking at runtime to enforce the constraint
+  // that only one mutable reference can be live at any given time.
+  // If one tries to mutably borrow a RefCell that is already mutably borrowed the calling thread will panic.
+  // cr. having a solution that results in runtime errors seem very brittle and limited.
+  //
+  // Cell and RefCell are not needed that often in everyday Rust
   request_count: Cell<usize>,
+
   // We can ensure mutually exclusive access to the vector by creating a Mutex that wraps our vector.
   //
   // Typically each value in Rust has a single owner, but for this situation we want each thread to be an owner of the data
@@ -83,10 +92,11 @@ struct IndexResponse {
 #[get("/")]
 async fn index(state:web::Data<AppState>) -> Result<web::Json<IndexResponse>> {
 
-  let request_count = state.request_count.get() + 1;
   // The reason that we cannot mutate request_count directly is that our state variable is an immutable reference.
   // There is no way for us to update server_id for example, therefore we use set and get
+  let request_count = state.request_count.get() + 1;
   state.request_count.set(request_count);
+
   // To get access to the data inside the mutex we call the lock method on the mutex.
   // The lock method blocks until the underlying operating system mutex is not held by another thread.
   // This method returns a Result wrapped around a MutexGuard which is wrapped around our data.
@@ -123,6 +133,109 @@ async fn index(state:web::Data<AppState>) -> Result<web::Json<IndexResponse>> {
   }))
 }
 
+#[derive(Deserialize)]
+struct PostInput{
+    message: String,
+}
+
+#[derive(Serialize)]
+struct PostResponse{
+    server_id: usize,
+    request_count: usize,
+    message: String,
+}
+
+#[derive(Serialize)]
+struct PostError{
+    server_id: usize,
+    request_count: usize,
+    error: String,
+}
+
+fn post(msg: web::Json<PostInput>, state: web::Data<AppState>) -> Result<web::Json<PostResponse>> {
+    let request_count = state.request_count.get() + 1;
+    state.request_count.set(request_count);
+    let mut ms = state.messages.lock().unwrap();
+    ms.push(msg.message.clone());
+
+    Ok(web::Json(PostResponse {
+        server_id: state.server_id,
+        request_count,
+        message: msg.message.clone(),
+    }))
+}
+
+fn post_error(err: JsonPayloadError, req: &HttpRequest) -> Error {
+    // Extensions
+    // Actix uses a type safe bag of additional data attached to requests called extensions. The state is just the value inside of the extensions with type web::Data<AppState>.
+    // We get a reference to the extensions by calling the extensions method on the request.
+    let extns = req.extensions();
+    // Call unwrap directly. We know that if our app is properly configured then we will always get back our state and thus this Option should never be None.
+    let state = extns.get::<web::Data<AppState>>().unwrap();
+    let request_count = state.request_count.get() + 1;
+    state.request_count.set(request_count);
+    let post_error = PostError {
+        server_id: state.server_id,
+        request_count,
+        error: format!("{}", err),
+    };
+    // InternalError is a helper provided by actix to wrap any error and turn it into a custom response.
+    // HttpResponse struct has a variety of helpers for building responses, one of which is
+    // BadRequest which sets the status code to 400 which by the spec means the server is working
+    // properly but your request was bad for some reason.
+    //
+    // In particular, libraries usually implement the From trait to define how to construct an instance of their type from other things.
+    // Users can then create their own types and call into to hook into the conversion facilities provided by the library.
+    InternalError::from_response(err, HttpResponse::BadRequest().json(post_error)).into()
+}
+
+
+// #[post("/clear")]
+// fn clear(state: web::Data<AppState>) -> Result<web::Json<IndexResponse>> {
+//     let request_count = state.request_count.get() + 1;
+//     state.request_count.set(request_count);
+//     let mut ms = state.messages.lock().unwrap();
+//     ms.clear();
+
+//     Ok(web::Json(IndexResponse {
+//         server_id: state.server_id,
+//         request_count,
+//         messages: vec![],
+//     }))
+// }
+
+
+// #[derive(Serialize)]
+// struct LookupResponse {
+//     server_id: usize,
+//     request_count: usize,
+//     // We use an Option because the lookup might fail if the index happens to be out of bounds of the current vector of messages.
+//     // The None variant will be serialized to null in JSON, and the Some variant will serialize to just the inner data.
+//     // An Option is returned because the index passed in might be out of bounds so this is a safe way of accessing data in the vector without having to manually check that the index is valid.
+//     result: Option<String>,
+// }
+
+// // Path Extractor
+// // signature of our input types has changed to include a web::Path extractor in addition to
+// // the Data extractor we use again because we still want to work with the state.
+// // The Path extractor uses the generic type specified, in this case usize, to attempt to deserialize the path segment to this type.
+// // Path extractor uses the generic type specified, in this case usize, to attempt to deserialize the path segment to this type.
+// // If we had multiple path segments, then we would pass a tuple with the different expected types in order to allow for deserialization.
+// // You can also pass a custom type that implements Deserialize to handle more complex use cases.
+// #[get("/lookup/{index}")]
+// fn lookup(state: web::Data<AppState>, idx: web::Path<usize>) -> Result<web::Json<LookupResponse>> {
+//     let request_count = state.request_count.get() + 1;
+//     state.request_count.set(request_count);
+//     let ms = state.messages.lock().unwrap();
+//     // into_inner() This converts the Path wrapper into the inner type it is wrapping, in this case a usize.
+//     let result = ms.get(idx.into_inner()).cloned();
+//     Ok(web::Json(LookupResponse {
+//         server_id: state.server_id,
+//         request_count,
+//         result,
+//     }))
+// }
+
 pub struct MessageApp {
   port: u16,
 }
@@ -146,19 +259,31 @@ impl MessageApp {
     HttpServer::new(move || {
 
       App::new()
-      .data(AppState {
-        // The second argument to fetch_add controls how atomic operations synchronize memory across threads.
-        // The strongest ordering is SeqCst which stands for sequentially consistent.
-        // The best advice is to use SeqCst until you profile your code, find out that this is a hot spot,
-        // and then can prove that you are able to use one of the weaker orderings based on your access pattern.
-        server_id: SERVER_COUNTER.fetch_add(1, Ordering::SeqCst),
-        request_count: Cell::new(0),
-        // We have to clone the message as we push it into the vector because this vector owns each element and we only have a borrowed reference to our PostInput data.
-        messages: messages.clone(),
+        .data(AppState {
+          // The second argument to fetch_add controls how atomic operations synchronize memory across threads.
+          // The strongest ordering is SeqCst which stands for sequentially consistent.
+          // The best advice is to use SeqCst until you profile your code, find out that this is a hot spot,
+          // and then can prove that you are able to use one of the weaker orderings based on your access pattern.
+          server_id: SERVER_COUNTER.fetch_add(1, Ordering::SeqCst),
+          request_count: Cell::new(0),
+          // We have to clone the message as we push it into the vector because this vector owns each element and we only have a borrowed reference to our PostInput data.
+          messages: messages.clone(),
         })
         // enable logger
-        .wrap(middleware::Logger::default())
+        .wrap(middleware::Logger::new(LOG_FORMAT))
         .service(index)
+        // .service(
+        //   web::resource("/send")
+        //     .data(
+        //       web::JsonConfig::default()
+        //         // Define limit on the number of bytes to deserialize to 4096 bytes.
+        //         .limit(4096)
+        //         .error_handler(post_error),
+        //     )
+        //     .route(web::post().to(post)),
+        //   )
+          // .service(clear)
+          // .service(lookup)
     })
     .bind(addr)?
     .workers(8)
