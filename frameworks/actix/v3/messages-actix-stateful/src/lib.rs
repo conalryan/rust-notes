@@ -152,9 +152,10 @@ struct PostError{
     error: String,
 }
 
-fn post(msg: web::Json<PostInput>, state: web::Data<AppState>) -> Result<web::Json<PostResponse>> {
+async fn post(msg: web::Json<PostInput>, state: web::Data<AppState>) -> Result<web::Json<PostResponse>> {
     let request_count = state.request_count.get() + 1;
     state.request_count.set(request_count);
+
     let mut ms = state.messages.lock().unwrap();
     ms.push(msg.message.clone());
 
@@ -272,18 +273,16 @@ impl MessageApp {
         // enable logger
         .wrap(middleware::Logger::new(LOG_FORMAT))
         .service(index)
-        // .service(
-        //   web::resource("/send")
-        //     .data(
-        //       web::JsonConfig::default()
-        //         // Define limit on the number of bytes to deserialize to 4096 bytes.
-        //         .limit(4096)
-        //         .error_handler(post_error),
-        //     )
-        //     .route(web::post().to(post)),
-        //   )
-          // .service(clear)
-          // .service(lookup)
+        .service(
+          web::resource("/send")
+            .data(web::JsonConfig::default()
+              .limit(4096) // Define limit on the number of bytes to deserialize to 4096 bytes.
+              .error_handler(post_error))
+              .route(web::post()
+              .to(post)),
+        )
+        // .service(clear)
+        // .service(lookup)
     })
     .bind(addr)?
     .workers(8)

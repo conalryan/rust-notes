@@ -37,10 +37,10 @@ async fn main() -> std::io::Result<()> {
     // so that we don’t have to set the environment variable in our terminal,
     // normally you would set this in your environment.
     std::env::set_var("RUST_LOG", "actix_web=info");
-
     // Those logging statements do not actually do anything unless a program is configured with an implementation.
     // We choose to use the implementation provided by the env_- logger crate which we turn on with the call to env_logger::init().
     env_logger::init();
+
     let app = MessageApp::new(8080);
     app.run()
     .await
