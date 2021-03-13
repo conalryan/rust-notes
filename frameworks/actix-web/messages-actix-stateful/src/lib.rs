@@ -168,13 +168,17 @@ async fn post(msg: web::Json<PostInput>, state: web::Data<AppState>) -> Result<w
 
 fn post_error(err: JsonPayloadError, req: &HttpRequest) -> Error {
     // Extensions
-    // Actix uses a type safe bag of additional data attached to requests called extensions. The state is just the value inside of the extensions with type web::Data<AppState>.
+    // Actix uses a type safe bag of additional data attached to requests called extensions.
+    // The state is just the value inside of the extensions with type web::Data<AppState>.
     // We get a reference to the extensions by calling the extensions method on the request.
     let extns = req.extensions();
-    // Call unwrap directly. We know that if our app is properly configured then we will always get back our state and thus this Option should never be None.
+    // Call unwrap directly. We know that if our app is properly configured then we will always
+    // get back our state and thus this Option should never be None.
     let state = extns.get::<web::Data<AppState>>().unwrap();
+
     let request_count = state.request_count.get() + 1;
     state.request_count.set(request_count);
+
     let post_error = PostError {
         server_id: state.server_id,
         request_count,
@@ -185,57 +189,61 @@ fn post_error(err: JsonPayloadError, req: &HttpRequest) -> Error {
     // BadRequest which sets the status code to 400 which by the spec means the server is working
     // properly but your request was bad for some reason.
     //
-    // In particular, libraries usually implement the From trait to define how to construct an instance of their type from other things.
-    // Users can then create their own types and call into to hook into the conversion facilities provided by the library.
+    // In particular, libraries usually implement the From trait to define how to construct an
+    // instance of their type from other things.
+    // Users can then create their own types and call into to hook into the conversion facilities
+    // provided by the library.
     InternalError::from_response(err, HttpResponse::BadRequest().json(post_error)).into()
 }
 
+#[post("/clear")]
+async fn clear(state: web::Data<AppState>) -> Result<web::Json<IndexResponse>> {
+    let request_count = state.request_count.get() + 1;
+    state.request_count.set(request_count);
 
-// #[post("/clear")]
-// fn clear(state: web::Data<AppState>) -> Result<web::Json<IndexResponse>> {
-//     let request_count = state.request_count.get() + 1;
-//     state.request_count.set(request_count);
-//     let mut ms = state.messages.lock().unwrap();
-//     ms.clear();
+    let mut ms = state.messages.lock().unwrap();
+    ms.clear();
 
-//     Ok(web::Json(IndexResponse {
-//         server_id: state.server_id,
-//         request_count,
-//         messages: vec![],
-//     }))
-// }
+    Ok(web::Json(IndexResponse {
+        server_id: state.server_id,
+        request_count,
+        messages: vec![],
+    }))
+}
 
 
-// #[derive(Serialize)]
-// struct LookupResponse {
-//     server_id: usize,
-//     request_count: usize,
-//     // We use an Option because the lookup might fail if the index happens to be out of bounds of the current vector of messages.
-//     // The None variant will be serialized to null in JSON, and the Some variant will serialize to just the inner data.
-//     // An Option is returned because the index passed in might be out of bounds so this is a safe way of accessing data in the vector without having to manually check that the index is valid.
-//     result: Option<String>,
-// }
+#[derive(Serialize)]
+struct LookupResponse {
+    server_id: usize,
+    request_count: usize,
+    // We use an Option because the lookup might fail if the index happens to be out of bounds of the current vector of messages.
+    // The None variant will be serialized to null in JSON, and the Some variant will serialize to just the inner data.
+    // An Option is returned because the index passed in might be out of bounds so this is a safe way of accessing data in the vector without having to manually check that the index is valid.
+    result: Option<String>,
+}
 
-// // Path Extractor
-// // signature of our input types has changed to include a web::Path extractor in addition to
-// // the Data extractor we use again because we still want to work with the state.
-// // The Path extractor uses the generic type specified, in this case usize, to attempt to deserialize the path segment to this type.
-// // Path extractor uses the generic type specified, in this case usize, to attempt to deserialize the path segment to this type.
-// // If we had multiple path segments, then we would pass a tuple with the different expected types in order to allow for deserialization.
-// // You can also pass a custom type that implements Deserialize to handle more complex use cases.
-// #[get("/lookup/{index}")]
-// fn lookup(state: web::Data<AppState>, idx: web::Path<usize>) -> Result<web::Json<LookupResponse>> {
-//     let request_count = state.request_count.get() + 1;
-//     state.request_count.set(request_count);
-//     let ms = state.messages.lock().unwrap();
-//     // into_inner() This converts the Path wrapper into the inner type it is wrapping, in this case a usize.
-//     let result = ms.get(idx.into_inner()).cloned();
-//     Ok(web::Json(LookupResponse {
-//         server_id: state.server_id,
-//         request_count,
-//         result,
-//     }))
-// }
+// Path Extractor
+// signature of our input types has changed to include a web::Path extractor in addition to
+// the Data extractor we use again because we still want to work with the state.
+// The Path extractor uses the generic type specified, in this case usize, to attempt to deserialize the path segment to this type.
+// Path extractor uses the generic type specified, in this case usize, to attempt to deserialize the path segment to this type.
+// If we had multiple path segments, then we would pass a tuple with the different expected types in order to allow for deserialization.
+// You can also pass a custom type that implements Deserialize to handle more complex use cases.
+#[get("/lookup/{index}")]
+async fn lookup(state: web::Data<AppState>, idx: web::Path<usize>) -> Result<web::Json<LookupResponse>> {
+    let request_count = state.request_count.get() + 1;
+    state.request_count.set(request_count);
+
+    let ms = state.messages.lock().unwrap();
+    // into_inner() This converts the Path wrapper into the inner type it is wrapping, in this case a usize.
+    let result = ms.get(idx.into_inner()).cloned();
+
+    Ok(web::Json(LookupResponse {
+        server_id: state.server_id,
+        request_count,
+        result,
+    }))
+}
 
 pub struct MessageApp {
   port: u16,
@@ -281,8 +289,8 @@ impl MessageApp {
               .route(web::post()
               .to(post)),
         )
-        // .service(clear)
-        // .service(lookup)
+        .service(clear)
+        .service(lookup)
     })
     .bind(addr)?
     .workers(8)

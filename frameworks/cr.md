@@ -21,4 +21,3 @@ https://github.com/yewstack/yew
 https://github.com/seed-rs/seed
 
 https://github.com/chinedufn/percy
-
