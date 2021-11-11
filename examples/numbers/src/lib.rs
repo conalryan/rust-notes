@@ -4,9 +4,10 @@
 /**
  * pub means public visibility
  * This is a privacy identifier which specifies that this function should be publicly accessible to user’s of our crate.
- * Without pub, we could call this function inside of our lib.rs file, but user’s of crate could
- * not call it.
- * Note our executable sees the library crate same as someone who included our library as a dependency in their Cargo.toml file. This ensures a proper separation of concerns between code meant to be executed as a binary and the actual functionality of your project.
+ * Without pub, we could call this function inside of our lib.rs file, but user’s of this crate could not call it.
+ *
+ * Note our executable sees the library crate same as someone who included our library as a dependency in their Cargo.toml file.
+ * This ensures a proper separation of concerns between code meant to be executed as a binary and the actual functionality of your project.
  */
 pub fn say_hello() {
     println!("Hello, world!");
@@ -106,7 +107,7 @@ pub fn print(limit: u8) {
     // Mulitplication factor:
     // As you add elements to a vector, capacity grows by a multiplicative factor
     // Done to reduce frequency.
-    // Biggest advantage: Sive of the vector is expandable; the length is not part of the type.
+    // Biggest advantage: Size of the vector is expandable; the length is not part of the type.
     //
     // Copy Trait
     // While arrays implement the Copy trait if their elements do, Vec does not.
