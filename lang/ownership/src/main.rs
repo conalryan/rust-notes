@@ -10,19 +10,29 @@ fn main() {
     // Why can String be mutated but literals cannot? The difference is how these two types deal with memory.
     // string literal, we know the contents at compile time, so the text is hardcoded directly into the final executable. This is why string literals are fast and efficient.
     // With the String type, in order to support a mutable, growable piece of text, we need to allocate an amount of memory on the heap, unknown at compile time, to hold the contents.
+    //
     // Memory management
     // We need to pair exactly one allocate with exactly one free.
+    // 
     // drop
-    // There is a natural point at which we can return the memory our String needs to the allocator: when s goes out of scope. When a variable goes out of scope, Rust calls a special function for us. This function is called drop, and it’s where the author of String can put the code to return the memory. Rust calls drop automatically at the closing curly bracket.
+    // There is a natural point at which we can return the memory our String needs to the allocator: when s goes out of scope. When a variable goes out of scope,
+    // Rust calls a special function for us. This function is called drop, and it’s where the author of String can put the code to return the memory.
+    // Rust calls drop automatically at the closing curly bracket.
     //
-    // Note: In C++, this pattern of deallocating resources at the end of an item’s lifetime is sometimes called Resource Acquisition Is Initialization (RAII). The drop function in Rust will be familiar to you if you’ve used RAII patterns.
+    // Note: In C++, this pattern of deallocating resources at the end of an item’s lifetime is sometimes called Resource Acquisition Is Initialization (RAII).
+    // The drop function in Rust will be familiar to you if you’ve used RAII patterns.
     //
     let mut s_mut_from = String::from("hello");
     s_mut_from.push_str(", world!"); // push_str() appends a literal to a String
     println!("{}", s_mut_from); // This will print `hello, world!`
 
-    // Earlier, we said that when a variable goes out of scope, Rust automatically calls the drop function and cleans up the heap memory for that variable. But Figure 4-2 shows both data pointers pointing to the same location. This is a problem: when s2 and s1 go out of scope, they will both try to free the same memory. This is known as a double free error and is one of the memory safety bugs we mentioned previously. Freeing memory twice can lead to memory corruption, which can potentially lead to security vulnerabilities.
-    // To ensure memory safety, there’s one more detail to what happens in this situation in Rust. Instead of trying to copy the allocated memory, Rust considers s1 to no longer be valid and, therefore, Rust doesn’t need to free anything when s1 goes out of scope. Check out what happens when you try to use s1 after s2 is created; it won’t work:
+    // Earlier, we said that when a variable goes out of scope, Rust automatically calls the drop function and cleans up the heap memory for that variable.
+    // But Figure 4-2 shows both data pointers pointing to the same location. This is a problem: when s2 and s1 go out of scope, they will both try to free the same memory.
+    // This is known as a double free error and is one of the memory safety bugs we mentioned previously. Freeing memory twice can lead to memory corruption,
+    // which can potentially lead to security vulnerabilities.
+    // To ensure memory safety, there’s one more detail to what happens in this situation in Rust. Instead of trying to copy the allocated memory, Rust considers s1 to 
+    // no longer be valid and, therefore, Rust doesn’t need to free anything when s1 goes out of scope. Check out what happens when you try to use s1 after s2 is created; 
+    // it won’t work:
     // instead of being called a shallow copy, it’s known as a move. In this example, we would say that s1 was moved into s2
     // Rust will never automatically create “deep” copies of your data. Therefore, any automatic copying can be assumed to be inexpensive in terms of runtime performance.
     let s_owner_one = String::from("hello");
@@ -40,7 +50,8 @@ fn main() {
     // variables stored entirely on the stack can be copied because it's so cheap
     // therefore no need to call clone like with heap allocated objects.
     // copy trait
-    // general rule, any group of simple scalar values can implement Copy, and nothing that requires allocation or is some form of resource can implement Copy. Here are some of the types that implement Copy:
+    // general rule, any group of simple scalar values can implement Copy, and nothing that requires allocation or is some form of resource can implement Copy.
+    // Here are some of the types that implement Copy:
     //
     // All the integer types, such as u32.
     // The Boolean type, bool, with values true and false.
