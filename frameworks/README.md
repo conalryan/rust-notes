@@ -16,6 +16,7 @@ WebAssembly
 ==============================================================================
 
 https://yew.rs/docs/en/
+
 https://github.com/yewstack/yew
 
 https://github.com/seed-rs/seed
