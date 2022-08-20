@@ -1,0 +1,3 @@
+Hello world from foo.txt
+Second line from foo.txt.
+And this is the last.
