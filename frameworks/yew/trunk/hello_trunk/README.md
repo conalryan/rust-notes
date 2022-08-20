@@ -7,4 +7,4 @@ src/
 Cargo.toml
 index.html
 
-
+Run `trunk serve`
