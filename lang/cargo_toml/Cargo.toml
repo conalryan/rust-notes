@@ -1,0 +1,37 @@
+# https://doc.rust-lang.org/cargo/commands/cargo-add.html
+#
+# Caro.toml
+# manifest file for the project.
+# This is the entry point for describing your project as well as specifying dependencies and configuration.
+
+# Crates
+# The primary unit of code organization.
+# Your code exists as a crate which can be distributed to the community via crates.io.
+# Crates in Rust are analogous to packages in JavaScript.
+# The registry at crates.io is similar to npmjs.com as the de facto community repository for distributing and sharing code.
+#
+# Binary projects are also called crates.
+# A crate can contain both a library and an executable.
+# Common practice is to create dual library/binary crates even when the primary intention of a project is to produce an executable.
+# This can have positive effects on the API design of your code knowing that it should be suitable for external consumption.
+#
+# APP:
+# - The binary part of the crate is typically responsible for argument parsing and configuration.
+#
+# LIB:
+# - App calls into the functionality exposed by the library.
+#
+# cr. Why isn't it called [crate] instead of [package]?
+[package]
+name = "cargo_toml"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# One feature of Rust has been to keep the core language and standard library relatively slim
+# and defer a lot of extra functionality to the community.
+# Therefore relying on third party dependencies is encouraged.
+#
+# Add: cargo add [options] crate...
+[dependencies]
