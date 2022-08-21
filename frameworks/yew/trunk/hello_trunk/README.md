@@ -8,3 +8,5 @@ Cargo.toml
 index.html
 
 Run `trunk serve`
+
+Build `trunk build --release`
