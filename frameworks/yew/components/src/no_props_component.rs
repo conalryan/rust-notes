@@ -12,7 +12,10 @@ impl Component for NoPropsComponent {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
-            { "This component has no properties!" }
+            // If you don't wrap in div then you'll have text you can't target with css
+            <div class="no-props-component">
+                { "This component has no properties!" }
+            </div>
         }
     }
 }

@@ -4,7 +4,7 @@ struct SomeOtherModel {
     a_num: i32,
 }
 
-pub struct SomeModel {
+pub struct SomeModelComponent {
     a_num: f64,
     a_bool: bool,
     a_string: String,
@@ -13,7 +13,7 @@ pub struct SomeModel {
     other_model: SomeOtherModel,
 }
 
-impl Component for SomeModel {
+impl Component for SomeModelComponent {
     type Message = ();
     type Properties = ();
 
@@ -32,7 +32,7 @@ impl Component for SomeModel {
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
        html! {
-            <div>
+            <div class="some-model-component">
                 <p>{ self.a_num }</p>
                 <p>{ self.a_bool }</p>
                 <p>{ &self.a_string }</p>
