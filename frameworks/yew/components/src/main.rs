@@ -1,8 +1,10 @@
 use yew::prelude::*;
 
 mod app;
-mod no_props;
-mod some_model;
+mod click_msg_component;
+mod no_props_component;
+mod some_model_component;
+mod some_props_component;
 
 use app::App;
 
