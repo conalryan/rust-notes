@@ -1,23 +1,34 @@
-# [Rust](https://www.rust-lang.org)
+[Rust](https://www.rust-lang.org)
+========================================================================================================================
 
-## Install
+Install
+------------------------------------------------------------------------------------------------------------------------
+
 Rustup: the Rust installer and version management tool
 ```bash
 curl https://sh.rustup.rs -sSf | sh
 ```
 
-## Toolchain Management `rustup`
+Toolchain Management `rustup`
+------------------------------------------------------------------------------------------------------------------------
+
 - Rapid 6-week release cycle
 - `rustup update`
 
-## Configuring the PATH environment variable
+Configuring the PATH environment variable
+------------------------------------------------------------------------------------------------------------------------
+
 - All tools are installed to the `~/.cargo/bin` directory (Rust toolchain: including rustc, cargo, and rustup).
 - Include this directory in their `PATH` environment variable.
 
-## Test installation
+Test installation
+------------------------------------------------------------------------------------------------------------------------
+
 `rustc --version`
 
 ## Cargo: the Rust build tool and package manager
+------------------------------------------------------------------------------------------------------------------------
+
 When you install Rustup you’ll also get the latest stable version of the Rust build tool and package manager, also known as Cargo. Cargo does lots of things:
 - build your project with `cargo build`
 - check for build errors `cargo check`
@@ -28,17 +39,23 @@ When you install Rustup you’ll also get the latest stable version of the Rust 
 - publish a library to [crates.io](https://crates.io/) with `cargo publish`
 - To test that you have Rust and Cargo installed, you can run this in your terminal of choice: `cargo --version`
 
-## Code formatting tool Rustfmt
+Code formatting tool Rustfmt
+------------------------------------------------------------------------------------------------------------------------
+
 ```bash
 rustup component add rustfmt
 ```
 
-## Linting tool Clippy
+Linting tool Clippy
+------------------------------------------------------------------------------------------------------------------------
+
 ```bash
 rustup component add clippy
 ```
 
-## Hello World
+Hello World
+------------------------------------------------------------------------------------------------------------------------
+
 ```bash
 cargo new hello-rust
 ```
@@ -47,7 +64,9 @@ cargo new hello-rust
 cargo run
 ```
 
-## Dependencies
+Dependencies
+------------------------------------------------------------------------------------------------------------------------
+
 - Managed via Cargo.toml
 - Libraries found on [crates.io](https://crates.io/), the pakcage registry for Rust.
 - Packages refered to as "crates."
