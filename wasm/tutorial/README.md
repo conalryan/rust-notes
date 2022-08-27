@@ -1,7 +1,9 @@
-[Tutorial](https://rustwasm.github.io/docs/book/game-of-life/introduction.html)
+[Rust and WebAssembly Tutorial](https://rustwasm.github.io/docs/book/)
+
+[4. Tutorial](https://rustwasm.github.io/docs/book/game-of-life/introduction.html)
 ========================================================================================================================
 
-[Setup](https://rustwasm.github.io/docs/book/game-of-life/setup.html)
+[4.1 Setup](https://rustwasm.github.io/docs/book/game-of-life/setup.html)
 ------------------------------------------------------------------------------------------------------------------------
 
 This section describes how to set up the toolchain for compiling Rust programs to WebAssembly and integrate them into JavaScript.
@@ -36,3 +38,103 @@ If you already have npm installed, make sure it is up to date with this command:
 
 `npm install npm@latest -g`
 
+[4.2 Hello, World](https://rustwasm.github.io/docs/book/game-of-life/hello-world.html)
+------------------------------------------------------------------------------------------------------------------------
+
+`cargo generate --git https://github.com/rustwasm/wasm-pack-template`
+
+This should prompt you for the new project's name. We will use "wasm-game-of-life".
+
+`wasm-game-of-life`
+
+Cargo.toml will now have
+```toml
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+wasm-bindgen = "0.2.63"
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however.
+#
+# Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
+wee_alloc = { version = "0.4.5", optional = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.13"
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
+```
+
+### 🛠️ Build with `wasm-pack build`
+
+```
+wasm-pack build
+```
+
+### 🔬 Test in Headless Browsers with `wasm-pack test`
+
+```
+wasm-pack test --headless --firefox
+```
+
+### 🎁 Publish to NPM with `wasm-pack publish`
+
+```
+wasm-pack publish
+```
+
+### [Putting it into a webpage](https://rustwasm.github.io/docs/book/game-of-life/hello-world.html#putting-it-into-a-web-page)
+
+To take our `wasm-game-of-life` package and use it in a Web page, we use the `create-wasm-app` JavaScript project template.
+
+Run this command within the wasm-game-of-life directory:
+
+`npm init wasm-app www`
+
+`cd www && npm install`
+
+### [Using your local `wasm-game-of-life` Package in `www`](https://rustwasm.github.io/docs/book/game-of-life/hello-world.html#using-our-local-wasm-game-of-life-package-in-www)
+
+Rather than use the `hello-wasm-pack` package from npm, we want to use our local `wasm-game-of-life` package instead.
+This will allow us to incrementally develop our Game of Life program.
+
+Open up `wasm-game-of-life/www/package.json` and next to `"devDependencies"`, add the `"dependencies"` field, including a `"wasm-game-of-life": "file:../pkg"` entry:
+```json
+{
+  // ...
+  "dependencies": {                     // Add this three lines block!
+    "wasm-game-of-life": "file:../pkg"
+  },
+  "devDependencies": {
+    //...
+  }
+}
+```
+
+Next, modify `wasm-game-of-life/www/index.js` to import `wasm-game-of-life` instead of the `hello-wasm-pack` package:
+
+```javascript
+import * as wasm from "wasm-game-of-life";
+
+wasm.greet();
+```
+
+Since we declared a new dependency, we need to install it:
+
+`npm install`
+
+`npm run start`
