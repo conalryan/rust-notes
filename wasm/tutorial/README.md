@@ -138,3 +138,23 @@ Since we declared a new dependency, we need to install it:
 `npm install`
 
 `npm run start`
+
+
+[4.4 Interfacing Rust and Javascript](https://rustwasm.github.io/docs/book/game-of-life/implementing.html#interfacing-rust-and-javascript)
+------------------------------------------------------------------------------------------------------------------------
+
+wasm_bindgen defines a common understanding of how to work with compound structures across this boundary.
+It involves boxing Rust structures, and wrapping the pointer in a JavaScript class for usability, or indexing into a table of JavaScript objects from Rust.
+wasm_bindgen is very convenient, but it does not remove the need to consider our data representation, and what values and structures are passed across this boundary.
+Instead, think of it as a tool for implementing the interface design you choose.
+
+When designing an interface between WebAssembly and JavaScript, we want to optimize for the following properties:
+
+    Minimizing copying into and out of the WebAssembly linear memory. Unnecessary copies impose unnecessary overhead.
+
+    Minimizing serializing and deserializing. Similar to copies, serializing and deserializing also imposes overhead, and often imposes copying as well.
+    If we can pass opaque handles to a data structure — instead of serializing it on one side, copying it into some known location in the WebAssembly linear memory, and deserializing on the other side — we can often reduce a lot of overhead. wasm_bindgen helps us define and work with opaque handles to JavaScript Objects or boxed Rust structures.
+
+As a general rule of thumb, a good JavaScript↔WebAssembly interface design is often one where large, long-lived data structures are implemented as Rust types that live in the WebAssembly linear memory, and are exposed to JavaScript as opaque handles. JavaScript calls exported WebAssembly functions that take these opaque handles, transform their data, perform heavy computations, query the data, and ultimately return a small, copy-able result. By only returning the small result of the computation, we avoid copying and/or serializing everything back and forth between the JavaScript garbage-collected heap and the WebAssembly linear memory.
+
+cr. WIP https://rustwasm.github.io/docs/book/game-of-life/implementing.html#interfacing-rust-and-javascript-in-our-game-of-life
