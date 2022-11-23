@@ -8,7 +8,7 @@
 # The primary unit of code organization.
 # Your code exists as a crate which can be distributed to the community via crates.io.
 # Crates in Rust are analogous to packages in JavaScript.
-# The registry at crates.io is similar to npmjs.com as the de facto community repository for distributing and sharing code.
+# The registry at crates.io is similar to npmjs.com as the defacto community repository for distributing and sharing code.
 #
 # Binary projects are also called crates.
 # A crate can contain both a library and an executable.

@@ -1,6 +1,8 @@
 Quick Guide
 --------------------------------------------------------------------------------
 
+https://doc.rust-lang.org/book/ch01-00-getting-started.html
+
 Build
 `cargo build`
 
