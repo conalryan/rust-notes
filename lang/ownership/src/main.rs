@@ -13,7 +13,7 @@ fn main() {
     //
     // Memory management
     // We need to pair exactly one allocate with exactly one free.
-    // 
+    //
     // drop
     // There is a natural point at which we can return the memory our String needs to the allocator: when s goes out of scope. When a variable goes out of scope,
     // Rust calls a special function for us. This function is called drop, and it’s where the author of String can put the code to return the memory.
@@ -30,8 +30,8 @@ fn main() {
     // But Figure 4-2 shows both data pointers pointing to the same location. This is a problem: when s2 and s1 go out of scope, they will both try to free the same memory.
     // This is known as a double free error and is one of the memory safety bugs we mentioned previously. Freeing memory twice can lead to memory corruption,
     // which can potentially lead to security vulnerabilities.
-    // To ensure memory safety, there’s one more detail to what happens in this situation in Rust. Instead of trying to copy the allocated memory, Rust considers s1 to 
-    // no longer be valid and, therefore, Rust doesn’t need to free anything when s1 goes out of scope. Check out what happens when you try to use s1 after s2 is created; 
+    // To ensure memory safety, there’s one more detail to what happens in this situation in Rust. Instead of trying to copy the allocated memory, Rust considers s1 to
+    // no longer be valid and, therefore, Rust doesn’t need to free anything when s1 goes out of scope. Check out what happens when you try to use s1 after s2 is created;
     // it won’t work:
     // instead of being called a shallow copy, it’s known as a move. In this example, we would say that s1 was moved into s2
     // Rust will never automatically create “deep” copies of your data. Therefore, any automatic copying can be assumed to be inexpensive in terms of runtime performance.
@@ -62,6 +62,7 @@ fn main() {
     let y = x;
     println!("x = {}, y = {}", x, y);
 
+    // Ownership and Functions
     // move
     let s = String::from("hello"); // s comes into scope
     takes_ownership(s); // s's value moves into the function and so is no longer valid here
