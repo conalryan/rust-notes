@@ -1,6 +1,6 @@
 
 // Structs
-// Similar to tuples, each pieces of a struct can be different types.
+// Similar to tuples, each piece of a struct can be different types.
 // Unlike tuples, you’ll name each piece of data so it’s clear what the values mean.
 // Structs are more flexible than tuples, the order of the data does not matter because they are named.
 // Each peice of data is called a field in a struct.
@@ -28,6 +28,15 @@ struct Rectangle {
 // Put all the things we can do with an instance of a type in one impl block,
 // rather than making future users of our code search for capabilities of our struct in various places in the library we provide.
 //
+// Associated Functions
+// All functions defined within an impl block are called associated functions because they’re associated with the type named after the impl.
+// We can define associated functions that don’t have self as their first parameter (and thus are not methods) because they don’t need an instance of the type to work with.
+//
+// Associated functions that aren’t methods are often used for constructors that will return a new instance of the struct.
+//
+// Multiple impl Blocks
+// Each struct is allowed to have multiple impl blocks.
+//
 // cr. so a class?
 impl Rectangle {
 
@@ -43,6 +52,16 @@ impl Rectangle {
     // & syntax because we don't want to take ownership, we just want to read, not write to it.
     fn area(&self) -> u32 {
         self.width * self.height
+    }
+
+    // To call this associated function, we use the :: syntax with the struct name;
+    // let sq = Rectangle::square(3); is an example.
+    // This function is namespaced by the struct: the :: syntax is used for both associated functions and namespaces created by modules.
+    fn square(size: u32) -> Self {
+        Rectangle {
+            width: size,
+            height: size
+        }
     }
 }
 
